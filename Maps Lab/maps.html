@@ -153,13 +153,13 @@ apparent where the hubs are for certain airlines and who is generally on time an
     "9": "September", "10": "November", "11": "December"
   }
   // Create dictionary of IATA code to airline
-  d3.csv("http://localhost:8000/airlines.csv", function(airlinesInfo){
+  d3.csv("airlines.csv", function(airlinesInfo){
     airlinesInfo.forEach(function(d){
       airlines[d.IATA_CODE] = d.AIRLINE
     })
   });
   // Create U.S. map
-  d3.json("http://localhost:8000/us_states.json", function(usData){
+  d3.json("us_states.json", function(usData){
     var states = svg.selectAll("path")
                     .data(usData.features)
                     .enter()
@@ -169,7 +169,7 @@ apparent where the hubs are for certain airlines and who is generally on time an
                     .attr("d", path)
   });
   // Put circles representing airports on map
-  d3.json("http://localhost:8000/airports.geojson", function(airportData){
+  d3.json("airports.geojson", function(airportData){
     var airports = svg.selectAll("circle")
                       .data(airportData.features)
                       .enter()
@@ -186,8 +186,8 @@ apparent where the hubs are for certain airlines and who is generally on time an
   });
   function plotIt(id, a){
     console.log(id, 'test')
-    d3.csv("http://localhost:8000/flights_edited.csv", function(flightsData){
-      d3.csv("http://localhost:8000/airports.csv", function(airportInfo){
+    d3.csv("flights_edited.csv", function(flightsData){
+      d3.csv("airports.csv", function(airportInfo){
         if(airportsDictNotCreated){
           airportInfo.forEach(function(d){
             airportLoc[d.IATA_CODE] = [d.AIRPORT, d.CITY, d.STATE]
