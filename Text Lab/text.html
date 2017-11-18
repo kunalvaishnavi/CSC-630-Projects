@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Analyzing News Articles</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <style>
+    body {
+      text-align: center;
+    }
+    p,text {
+      font-family: 'Roboto', sans-serif;
+    }
+    h4 {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 200;
+      text-align: center;
+      width: 75%;
+      margin: 0 auto;
+    }
+    h1,h2 {
+      font-family: 'Georgia', serif;
+      font-weight: 200;
+    }
+    #container {
+      margin: 0 auto;
+      margin-top: 50px;
+      width: 95%;
+    }
+    .topbar{
+      fill: #4298f4;
+    }
+    .botbar{
+      fill: #ed6657;
+    }
+    </style>
+    <script src='https://d3js.org/d3.v4.min.js'></script>
+</head>
+<body>
+<h1>Tone of News Articles in 2015 and 2016</h1>
+<div id="container"></div>
+<h4>This is a visualization of the tone of news articles from Jan 2015 to Dec 2016.
+Blue and red represent the percentage of overall positive and overall negative tone
+in all news articles in a given month respectively. </h4>
+<h2>By: Kunal Vaishnavi</h2>
+<script>
+  // ******* Constants *******
+  const width = 1000,
+        height = 600,
+        margin = {
+            top: 10,
+            bottom: 100,
+            left: 100,
+            right: 10,
+        };
+
+  // ******* Create SVG *******
+  var svg = d3.select("#container").append("svg")
+              .attr("width", width)
+              .attr("height", height)
+              .style("margin", "0 auto")
+              .style("display", "block")
+              .style("overflow", "visible")
+  // Make axes
+  var xScale = d3.scaleBand()
+                  .domain(['Jan \'15', 'Feb \'15', 'Mar \'15', 'Apr \'15', 'May \'15', 'Jun \'15',
+                           'Jul \'15', 'Aug \'15', 'Sep \'15', 'Oct \'15', 'Nov \'15', 'Dec \'15',
+                           'Jan \'16', 'Feb \'16', 'Mar \'16', 'Apr \'16', 'May \'16', 'Jun \'16',
+                           'Jul \'16', 'Aug \'16', 'Sep \'16', 'Oct \'16', 'Nov \'16', 'Dec \'16'])
+                  .range([margin.left, width - margin.right])
+                  .paddingInner(0.05)
+                  .paddingOuter(0.05)
+  var yScale = d3.scaleLinear()
+                  .domain([-60, 70])
+                  .range([height - margin.bottom, margin.top])
+  // X axis
+  svg.append("g")
+      .attr("transform", `translate(${0}, ${height - margin.bottom})`)
+      .call(d3.axisBottom(xScale))
+  // X axis caption
+  svg.append("text")
+      .attr("transform",
+      `translate(${width / 2}, ${height - (margin.bottom / 2)})`)
+      .text("Time");
+  // Y axis
+  svg.append("g")
+      .attr("transform", `translate(${margin.left}, ${0})`)
+      .call(d3.axisLeft(yScale).ticks(20));
+  // Y axis caption
+  svg.append("text")
+      .attr("transform",
+      `translate(${margin.left / 2}, ${height / 1.65}) rotate(-90) `)
+      .text("Percentage of Positivity/Negativity");
+
+  // Plot the data in a time-series
+  d3.csv("http://localhost:8000/posNegVals.csv", function(data){
+    var posTotal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    var negTotal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data.forEach(function(d){
+      var month = +d.date.slice(0, d.date.indexOf('/'))
+      var year = +d.date.slice(d.date.lastIndexOf('/')+1)
+      if(year == 15){
+        posTotal[month-1] += +d.positive
+        negTotal[month-1] += +d.negative
+      }
+      else{
+        posTotal[month-1+12] += +d.positive
+        negTotal[month-1+12] += +d.negative
+      }
+    })
+    var posPer = [], negPer = []
+    for(var x = 0; x < posTotal.length; x++){
+      posPer.push(posTotal[x]*100/(posTotal[x]+negTotal[x]))
+      negPer.push(negTotal[x]*100/(negTotal[x]+posTotal[x]))
+    }
+    // For some odd reason, D3 is skipping the first element in 'dataset' and I
+    // had to predefine my dataset. It wouldn't graph otherwise.
+    var dataset = [
+      {month : 'Jan \'15', pos: posPer[0], neg: negPer[0]},
+      {month : 'Jan \'15', pos: posPer[0], neg: negPer[0]},
+      {month : 'Feb \'15', pos: posPer[1], neg: negPer[1]},
+      {month : 'Mar \'15', pos: posPer[2], neg: negPer[2]},
+      {month : 'Apr \'15', pos: posPer[3], neg: negPer[3]},
+      {month : 'May \'15', pos: posPer[4], neg: negPer[4]},
+      {month : 'Jun \'15', pos: posPer[5], neg: negPer[5]},
+      {month : 'Jul \'15', pos: posPer[6], neg: negPer[6]},
+      {month : 'Aug \'15', pos: posPer[7], neg: negPer[7]},
+      {month : 'Sep \'15', pos: posPer[8], neg: negPer[8]},
+      {month : 'Oct \'15', pos: posPer[9], neg: negPer[9]},
+      {month : 'Nov \'15', pos: posPer[10], neg: negPer[10]},
+      {month : 'Dec \'15', pos: posPer[11], neg: negPer[11]},
+      {month : 'Jan \'16', pos: posPer[12], neg: negPer[12]},
+      {month : 'Feb \'16', pos: posPer[13], neg: negPer[13]},
+      {month : 'Mar \'16', pos: posPer[14], neg: negPer[14]},
+      {month : 'Apr \'16', pos: posPer[15], neg: negPer[15]},
+      {month : 'May \'16', pos: posPer[16], neg: negPer[16]},
+      {month : 'Jun \'16', pos: posPer[17], neg: negPer[17]},
+      {month : 'Jul \'16', pos: posPer[18], neg: negPer[18]},
+      {month : 'Aug \'16', pos: posPer[19], neg: negPer[19]},
+      {month : 'Sep \'16', pos: posPer[20], neg: negPer[20]},
+      {month : 'Oct \'16', pos: posPer[21], neg: negPer[21]},
+      {month : 'Nov \'16', pos: posPer[22], neg: negPer[22]},
+      {month : 'Dec \'16', pos: posPer[23], neg: negPer[23]}
+    ];
+    var rect = svg.selectAll("rect")
+                  .data(dataset)
+                  .enter()
+                  .append("rect")
+                  .attr("class", "topbar")
+                  .attr("x", function(d){ return xScale(d.month) })
+                  .attr("y", function(d){ return yScale(d.pos) })
+                  .attr("width", xScale.bandwidth())
+                  .attr("height", function(d){ return 275-yScale(d.pos) })
+    var rect1 = svg.selectAll("rect1")
+                  .data(dataset)
+                  .enter()
+                  .append("rect")
+                  .attr("class", "botbar")
+                  .attr("x", function(d){ return xScale(d.month) })
+                  .attr("y", 274)
+                  .attr("width", xScale.bandwidth())
+                  .attr("height", function(d){ return 274-yScale(d.neg) })
+  });
+</script>
+</body>
+</html>
