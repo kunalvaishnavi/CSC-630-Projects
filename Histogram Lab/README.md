@@ -1,11 +1,6 @@
 The purpose of this lab was to demonstrate the normal distribution in a histogram. Here was the lab background from our course page:
 
-A histogram is a univariate visualization --- that means that it only displays information about one variable, or column, of data. 
-Take a look at the link (to Wikipedia) to see many examples of them. 
-
-The idea behind a histogram is to take your column of data and break its range into distinct bins, and to create a count of all 
-the samples (or rows) that lie in each bin. You then plot those counts, rather than the data itself. This gives a rough approximation 
-to the distribution of the data, i.e. if you were to collect larger and larger samples of this data, how the limiting shape would appear.
+A histogram is a univariate visualization --- that means that it only displays information about one variable, or column, of data. The idea behind a histogram is to take your column of data and break its range into distinct bins, and to create a count of all the samples (or rows) that lie in each bin. You then plot those counts, rather than the data itself. This gives a rough approximation to the distribution of the data, i.e. if you were to collect larger and larger samples of this data, how the limiting shape would appear.
 
 Now, in JavaScript, one can create a random number by using Math.random(). This will generate a number between 0 and 1, uniformly. 
 Hence the histogram your create will approximate the uniform distribution However, the Central Limit Theorem says (among other things) 
