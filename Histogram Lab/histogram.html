@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+	<title>Histogram</title>
+  <link href="histogram.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+  Number of samples: <input type="text" id="samples" value="1000"><br><br>
+  Number of random numbers: <input type="text" id="randnums" value="4"><br><br>
+  Number of bins: <input type="text" id="bins" value="10"><br><br><br>
+  <svg x="50" height="400" width="400" xmlns="http://www.w3.org/2000/svg"
+  version="1.1" id="drawingSpace">
+    <rect height="400" width="400" fill="white"
+          stroke="black" stroke-width="1"></rect>
+  </svg><br><br><br><br>
+
+  <button type="button" id="b"
+  onclick="makeGraph(+document.getElementById('samples').value,
+                     +document.getElementById('randnums').value,
+                     +document.getElementById('bins').value)">Create histogram!
+  </button>
+  <!-- Calculate the values -->
+  <script>
+    function generateDistribution(numSamples, normalcy){
+      var nums = [];
+      for(i = 0; i < numSamples; i++){
+        var total = 0.0;
+        for(j = 0; j < normalcy; j++){
+          total += Math.random();
+        }
+        nums.push(total/normalcy);
+      }
+      return nums;
+    }
+    function makeGraph(numSamples, normalcy, numBins){
+      var arr = generateDistribution(numSamples, normalcy);
+      arr.sort();
+      console.log(arr);
+      // Now calculate totals in each bin
+      var total = [], count = 0, numerator = 1, pos = 0;
+      while(pos < arr.length){
+        var num = numerator/numBins;
+        if(arr[pos] <= num){
+          count++;
+          pos++;
+        }
+        else{
+          total.push(count);
+          numerator++;
+          count = 0;
+        }
+      }
+      total.push(count); // Add the last count before the while loop breaks
+      while(total.length != numBins){ total.push(0); }
+      console.log(total);
+      var sum = 0;
+      for(i = 0; i < total.length; i++){
+        sum += total[i];
+      }
+      // Calculate the dimensions and positions of the rects
+      var rectDimensions = [],
+          w = +document.getElementById("drawingSpace").getAttribute("width"),
+          h = +document.getElementById("drawingSpace").getAttribute("height");
+      for(i = 0; i < numBins; i++){
+        var tempRect = [];
+        var height = (h/sum)*total[i]*2, width = w/numBins;
+        var x = width*i, y = h-height;
+        tempRect.push(height);
+        tempRect.push(width);
+        tempRect.push(x);
+        tempRect.push(y);
+        rectDimensions.push(tempRect);
+      }
+      console.log(rectDimensions.toString());
+      createRect(h-2, w-2, 1, 1, 'white', 'black', '0');
+      var constant = 395/findMaxNum(rectDimensions);
+      for(i = 0; i < rectDimensions.length; i++){
+        createRect(rectDimensions[i][0]*constant, rectDimensions[i][1],
+                   rectDimensions[i][2], rectDimensions[i][3],
+                   "#b186ba", 'black', '1');
+      }
+    }
+    function createRect(h, w, x, y, f, s, sw){
+      var link = "http://www.w3.org/2000/svg";
+      var rect = document.createElementNS(link, 'rect');
+      rect.setAttributeNS(null, 'height', h);
+      rect.setAttributeNS(null, 'width', w);
+      rect.setAttributeNS(null, 'x', x);
+      rect.setAttributeNS(null, 'y', 399-h);
+      rect.setAttributeNS(null, 'fill', f);
+      rect.setAttributeNS(null, 'stroke', s);
+      rect.setAttributeNS(null, 'stroke-width', sw);
+      document.getElementById('drawingSpace').appendChild(rect);
+    }
+    function findMaxNum(arr){
+      max = arr[0][0];
+      for(i = 0; i < arr.length; i++){
+        if(max < arr[i][0]){ max = arr[i][0]; }
+      }
+      return max;
+    }
+  </script>
+</body>
+</html>
