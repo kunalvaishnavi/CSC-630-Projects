@@ -101,7 +101,7 @@ const width = 675,
       };
 
 function drawGraph(){
-  d3.csv("http://localhost:8000/cwurData.csv", function (error, data) {
+  d3.csv("cwurData.csv", function (error, data) {
     data.forEach(function(d){
       d.world_rank = +d.world_rank;
       d.national_rank = +d.national_rank;
