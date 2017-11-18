@@ -4,4 +4,4 @@ This repository hosts all of my visualizations from the entire course. Go to thi
 
 The layout for this entire repository is taken from Dr. Z's visualization site [template](https://github.com/nzufelt/viz_site_template).
 
-Note that due to GitHub's restrictions on file sizes, some of the original datasets are not uploaded. I have uploaded them to Kaggle.
+Note that due to GitHub's restrictions on file sizes, some of the original datasets are not uploaded. I have uploaded them [here](https:kaggle.com/kunalvaishnavi/csc-630-datasets) on Kaggle.
