@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Comparing Colleges</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="d3_scatterplot.css" type="text/css" rel="stylesheet">
+    <script src='https://d3js.org/d3.v4.min.js'></script>
+</head>
+<body>
+  <h1> Comparing Colleges</h1>
+  <!-- buttons -->
+  <button id="random200" class="dropbtn" style="float: left"
+  onclick="updateData(this.id)">Random 200</button>
+  <button id="top200" class="dropbtn" style="float: left"
+  onclick="updateData(this.id)">Top 200</button><br><br><br>
+  <div class="dropdown" style="float: left">
+    <button class="dropbtn">
+      X-axis
+    <b class="caret">&#9660</b>
+    </button>
+      <div class="dropdown-content">
+        <a id="world_rankX" onclick="updateData(this.id)">World Rank</a>
+        <a id="national_rankX" onclick="updateData(this.id)">National Rank</a>
+        <a id="quality_of_educationX" onclick="updateData(this.id)">Quality of Education</a>
+        <a id="alumni_employmentX" onclick="updateData(this.id)">Alumni Employment</a>
+        <a id="quality_of_facultyX" onclick="updateData(this.id)">Quality of Faculty</a>
+        <a id="publicationsX" onclick="updateData(this.id)">Publications</a>
+        <a id="influenceX" onclick="updateData(this.id)">Influence</a>
+        <a id="citationsX" onclick="updateData(this.id)">Citations</a>
+        <a id="broad_impactX" onclick="updateData(this.id)">Broad Impact</a>
+        <a id="patentsX" onclick="updateData(this.id)">Patents</a>
+        <a id="scoreX" onclick="updateData(this.id)">Score</a>
+      </div>
+  </div>
+  <div class="dropdown" style="float: left">
+    <button class="dropbtn">
+      Y-axis
+      <b class="caret">&#9660</b>
+    </button>
+    <div class="dropdown-content">
+      <a id="world_rankY" onclick="updateData(this.id)">World Rank</a>
+      <a id="national_rankY" onclick="updateData(this.id)">National Rank</a>
+      <a id="quality_of_educationY" onclick="updateData(this.id)">Quality of Education</a>
+      <a id="alumni_employmentY" onclick="updateData(this.id)">Alumni Employment</a>
+      <a id="quality_of_facultyY" onclick="updateData(this.id)">Quality of Faculty</a>
+      <a id="publicationsY" onclick="updateData(this.id)">Publications</a>
+      <a id="influenceY" onclick="updateData(this.id)">Influence</a>
+      <a id="citationsY" onclick="updateData(this.id)">Citations</a>
+      <a id="broad_impactY" onclick="updateData(this.id)">Broad Impact</a>
+      <a id="patentsY" onclick="updateData(this.id)">Patents</a>
+      <a id="scoreY" onclick="updateData(this.id)">Score</a>
+    </div>
+  </div>
+
+<div id="container"></div>
+<p> By: Kunal Vaishnavi </p>
+<p id="instructions" width="500">Instructions:<br><br> Simply hit the "Top 200 button" to start.
+  Thereafter, hover over the x and y axis buttons and click what you want for each
+  axis; it'll update automatically. If you want a random data set, hit the "Random 200"
+  button.
+</p>
+
+<script>
+
+// Global variables
+var x_axis_label = "World Rank";
+var y_axis_label = "Quality of Education";
+var x_id = "world_rank";
+var y_id = "quality_of_education";
+var axes_options = {}; // Format is [x-axis, y-axis] for each category
+var set = null;
+var categories = ["world_rank","institution","country","national_rank",
+                  "quality_of_education","alumni_employment","quality_of_faculty",
+                  "publications","influence","citations","broad_impact","patents",
+                  "score","year"];
+var svg;
+var svg_drawn = false;
+var circle_drawn = false;
+
+// Determine the id of the button and update the graph appropriately
+function updateData(id){
+  if(id.substring(id.length-1) == 'X'){
+    x_id = id.slice(0,-1);
+    x_axis_label = document.getElementById(id).innerHTML;}
+  if(id.substring(id.length-1) == 'Y'){
+    y_id = id.slice(0,-1);
+    y_axis_label = document.getElementById(id).innerHTML;}
+  if(id == "random200"){set = "random200";}
+  drawGraph();
+}
+
+// ******* Constants *******
+const width = 675,
+      height = 500,
+      margin = {
+          top: 30,
+          bottom: 100, // Affects x-axis caption
+          left: 100, // Affects y-axis caption
+          right: 30,
+      };
+
+function drawGraph(){
+  d3.csv("http://localhost:8000/cwurData.csv", function (error, data) {
+    data.forEach(function(d){
+      d.world_rank = +d.world_rank;
+      d.national_rank = +d.national_rank;
+      d.quality_of_education = +d.quality_of_education;
+      d.alumni_employment = +d.alumni_employment;
+      d.quality_of_faculty = +d.quality_of_faculty;
+      d.publications = +d.publications;
+      d.influence = +d.influence;
+      d.broad_impact = +d.broad_impact;
+      d.patents = +d.patents;
+      d.score = +d.score;
+      d.year = +d.year;
+      d.citations = +d.citations;
+    });
+    data.splice(0, 200); // Deletes stuff before 2014
+    data.splice(1000); // Deletes stuff after 2014
+    if(set != "random200"){ set = data.slice(0, 200); }
+    else{
+      var num = Math.floor(Math.random()*800);
+      set = data.slice(num, num+200);
+    }
+
+    // ******* Set Axes *******
+    for(var i = 0; i < categories.length; i++){
+      var xScale = d3.scaleLinear()
+      .domain(d3.extent(set, function(d) {return d[categories[i]]}))
+      .range([margin.left, width - margin.right]);
+      var yScale = d3.scaleLinear()
+      .domain(d3.extent(set, function(d) {return d[categories[i]]}))
+      .range([height - margin.bottom, margin.top]);
+      axes_options[categories[i]] = [xScale, yScale];
+    };
+
+    // ******* Create SVG *******
+    if(svg_drawn == false){
+      svg = d3.select("#container").append("svg")
+              .attr("width", width+50)
+              .attr("height", height)
+              .style("margin", "0 auto")
+              .style("display", "block")
+              // .style("overflow", "visible")
+      svg_drawn = true;
+    }
+
+    // Create data points
+    if(circle_drawn == false){
+      // ******* Add data *******
+      svg.selectAll("circle")
+          .data(set)
+          .enter()
+          .append("circle")
+          .attr("fill", "purple")
+          .attr("cx", function(d) {return axes_options[x_id][0](d[x_id])})
+          .attr("cy", function(d) {return axes_options[y_id][1](d[y_id])})
+          .attr("r", 3)
+          .on("mouseover", displayInfo)
+          .on("mouseout", removeInfo)
+          // .attr("class", function(d) {return d.species})
+      circle_drawn = true;
+    }
+    else{
+      // Removes old axes and captions
+      svg.selectAll("g").remove();
+      svg.selectAll("text").remove();
+      // Transition here
+      svg.selectAll("circle")
+          .data(set)
+          .transition()
+          .duration(1000)
+          .attr("fill", "purple")
+          .attr("cx", function(d) {return axes_options[x_id][0](d[x_id])})
+          .attr("cy", function(d) {return axes_options[y_id][1](d[y_id])})
+          .attr("r", 3)
+    }
+
+    function displayInfo(d, i){
+      d3.select(this)
+        .attr("fill", "green")
+        .attr("r", 6);
+      svg.append("text")
+         .attr("id", "t" + d["institution"] + "-" + i)
+         .attr("x", "125")
+         .attr("y", "15")
+         .text(function() { return [d["institution"], " " + d["world_rank"]];
+       });
+    }
+
+    function removeInfo(d, i){
+      d3.select(this)
+        .attr("fill", "purple")
+        .attr("r", 3);
+      var caption = document.getElementById("t" + d["institution"] + "-" + i);
+      d3.select(caption).remove();
+    }
+
+    // ******* Axes *******
+    svg.append("g")
+    .attr("transform",`translate(${0}, ${height - margin.bottom})`)
+    .call(d3.axisBottom(axes_options[x_id][0]).ticks(5));
+
+    svg.append("text")
+    .attr("transform",
+    `translate(${width / 2}, ${height - (margin.bottom / 2)})`)
+    .text(x_axis_label);
+
+    svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${0})`)
+    .call(d3.axisLeft(axes_options[y_id][1]).ticks(5));
+
+    svg.append("text")
+    .attr("transform",
+    `translate(${margin.left / 2}, ${height / 2}) rotate(-90) `)
+    .text(y_axis_label);
+  })
+}
+</script>
+</body>
+</html>
