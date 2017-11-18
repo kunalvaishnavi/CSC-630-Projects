@@ -93,7 +93,7 @@ in all news articles in a given month respectively. </h4>
       .text("Percentage of Positivity/Negativity");
 
   // Plot the data in a time-series
-  d3.csv("http://localhost:8000/posNegVals.csv", function(data){
+  d3.csv("posNegVals.csv", function(data){
     var posTotal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     var negTotal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     data.forEach(function(d){
