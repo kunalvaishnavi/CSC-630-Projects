@@ -1,4 +1,4 @@
-# CSC 630 Projects by Kunal Vaishnavi
+# CSC 630 Projects
 
 This repository hosts all of my visualizations from the entire course. Go to this [link](https://kunalvaishnavi.github.io/CSC-630-Projects) to see them.
 
